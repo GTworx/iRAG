@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iRAG Search | Multi-Source File Search</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h1>iRAG<span>Search</span></h1>
+                </div>
+            </div>
+
+            <!-- Source Connection Panel -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Data Sources</h3>
+                <div class="sources-list">
+                    <!-- Local Folder (Fully Functional) -->
+                    <button class="source-card active" id="btn-local-source" data-source="local">
+                        <div class="source-icon local">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="source-info">
+                            <div class="source-name">Local Folder</div>
+                            <div class="source-status" id="status-local">Ready to index</div>
+                        </div>
+                        <span class="source-indicator functional-badge">Real</span>
+                    </button>
+
+                    <!-- Google Drive (Simulated) -->
+                    <button class="source-card" id="btn-gdrive-source" data-source="gdrive">
+                        <div class="source-icon gdrive">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <div class="source-info">
+                            <div class="source-name">Google Drive</div>
+                            <div class="source-status" id="status-gdrive">Not connected</div>
+                        </div>
+                        <span class="source-indicator dot"></span>
+                    </button>
+
+                    <!-- Dropbox (Simulated) -->
+                    <button class="source-card" id="btn-dropbox-source" data-source="dropbox">
+                        <div class="source-icon dropbox">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <div class="source-info">
+                            <div class="source-name">Dropbox</div>
+                            <div class="source-status" id="status-dropbox">Not connected</div>
+                        </div>
+                        <span class="source-indicator dot"></span>
+                    </button>
+
+                    <!-- iCloud (Simulated) -->
+                    <button class="source-card" id="btn-icloud-source" data-source="icloud">
+                        <div class="source-icon icloud">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a5 5 0 0 0-5 5v1a4 4 0 0 0-4 4 4 4 0 0 0 4 4h10a4 4 0 0 0 4-4 4 4 0 0 0-4-4V7a5 5 0 0 0-5-5z"></path>
+                            </svg>
+                        </div>
+                        <div class="source-info">
+                            <div class="source-name">iCloud Drive</div>
+                            <div class="source-status" id="status-icloud">Not connected</div>
+                        </div>
+                        <span class="source-indicator dot"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Panel -->
+            <div class="sidebar-section indexer-stats" id="indexer-stats-panel" style="display: none;">
+                <h3 class="section-title">Index Information</h3>
+                <div class="stat-group">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Files</span>
+                        <span class="stat-value" id="stat-file-count">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Index Status</span>
+                        <span class="stat-value text-success" id="stat-status">Synced</span>
+                    </div>
+                </div>
+                <div class="folder-path-display" id="selected-path-display" title="No folder selected">
+                    No folder selected
+                </div>
+                <button class="btn btn-secondary btn-sm w-full" id="btn-reindex" style="display: none;">
+                    <svg class="icon-spin-hover" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                    </svg>
+                    Re-index Folder
+                </button>
+            </div>
+
+            <!-- Action Area / Footer -->
+            <div class="sidebar-footer">
+                <div class="developer-tag">
+                    <div class="avatar">iR</div>
+                    <div class="dev-info">
+                        <span class="dev-name">iRAG Engine v1.0</span>
+                        <span class="dev-status">Local & Cloud Search</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Search Header -->
+            <header class="search-header">
+                <div class="search-bar-container">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="search-input" placeholder="Select a data source to begin searching..." disabled autocomplete="off">
+                        <button class="clear-search-btn" id="btn-clear-search" style="display: none;" title="Clear search">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="search-mode-toggle">
+                        <button class="toggle-btn active" id="btn-mode-filename" title="Search file and folder names">Names</button>
+                        <button class="toggle-btn" id="btn-mode-content" title="Search inside file contents (text/code)">Content</button>
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <span class="filter-label">Filters:</span>
+                        <div class="filter-select-wrapper">
+                            <select id="filter-type">
+                                <option value="all">All File Types</option>
+                                <option value="document">Documents (.pdf, .docx, .txt, .md)</option>
+                                <option value="code">Code (.js, .py, .html, .css, .json)</option>
+                                <option value="image">Images (.png, .jpg, .svg)</option>
+                                <option value="archive">Archives (.zip, .tar, .rar)</option>
+                            </select>
+                        </div>
+                        <div class="filter-select-wrapper">
+                            <select id="filter-date">
+                                <option value="any">Any Time</option>
+                                <option value="day">Last 24 Hours</option>
+                                <option value="week">Last Week</option>
+                                <option value="month">Last Month</option>
+                                <option value="year">Last Year</option>
+                            </select>
+                        </div>
+                        <div class="filter-select-wrapper">
+                            <select id="filter-size">
+                                <option value="any">Any Size</option>
+                                <option value="small">Small (< 1 MB)</option>
+                                <option value="medium">Medium (1 - 10 MB)</option>
+                                <option value="large">Large (> 10 MB)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="active-source-badge" id="active-source-indicator" style="display: none;">
+                        <span>Local Folder</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content Areas -->
+            <div class="content-body">
+                <!-- Welcome/Landing Dashboard (Shown when no folder is selected) -->
+                <div class="dashboard-view" id="panel-welcome">
+                    <div class="hero-section">
+                        <div class="hero-graphic">
+                            <div class="orb-glow"></div>
+                            <div class="nodes-container">
+                                <!-- Simulated connections -->
+                                <div class="node c-node">iRAG</div>
+                                <div class="node-line l1"></div>
+                                <div class="node-line l2"></div>
+                                <div class="node-line l3"></div>
+                                <div class="node-line l4"></div>
+                                <div class="node s-node n-local">Local</div>
+                                <div class="node s-node n-gdrive">GDrive</div>
+                                <div class="node s-node n-dropbox">Dropbox</div>
+                                <div class="node s-node n-icloud">iCloud</div>
+                            </div>
+                        </div>
+                        <h2>Connect a Directory to Search</h2>
+                        <p class="hero-subtitle">Search, index, and query your files instantly across local folders or cloud storage accounts.</p>
+                    </div>
+
+                    <div class="action-grid">
+                        <div class="action-card local-card">
+                            <div class="card-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3>Select Local Directory</h3>
+                            <p>Directly read folders on your hard drive. Supports full-text indexing of documents, logs, and code files entirely in-browser.</p>
+                            <button class="btn btn-primary" id="btn-connect-local">Select Folder</button>
+                        </div>
+
+                        <div class="action-card cloud-card gdrive-card">
+                            <div class="card-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <h3>Google Drive</h3>
+                            <p>Connect your Google Drive account. Browse folders and run index queries across your shared documents and assets.</p>
+                            <button class="btn btn-outline" id="btn-connect-gdrive">Connect Drive</button>
+                        </div>
+
+                        <div class="action-card cloud-card dropbox-card">
+                            <div class="card-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                </svg>
+                            </div>
+                            <h3>Dropbox</h3>
+                            <p>Link your Dropbox account. Search documents, sheets, and media assets using high-performance filters.</p>
+                            <button class="btn btn-outline" id="btn-connect-dropbox">Connect Dropbox</button>
+                        </div>
+
+                        <div class="action-card cloud-card icloud-card">
+                            <div class="card-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2a5 5 0 0 0-5 5v1a4 4 0 0 0-4 4 4 4 0 0 0 4 4h10a4 4 0 0 0 4-4 4 4 0 0 0-4-4V7a5 5 0 0 0-5-5z"></path>
+                                </svg>
+                            </div>
+                            <h3>iCloud Drive</h3>
+                            <p>Sync with your iCloud Drive documents. Locate items stored in your Apple cloud environment.</p>
+                            <button class="btn btn-outline" id="btn-connect-icloud">Connect iCloud</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indexing / Loading Spinner Screen -->
+                <div class="indexing-view" id="panel-indexing" style="display: none;">
+                    <div class="spinner-container">
+                        <div class="spinner">
+                            <div class="double-bounce1"></div>
+                            <div class="double-bounce2"></div>
+                        </div>
+                        <h3 id="indexing-title">Indexing directory...</h3>
+                        <p id="indexing-progress">Scanning file system structure. This might take a few seconds depending on the directory size.</p>
+                        <div class="indexing-bar-wrapper">
+                            <div class="indexing-bar" id="indexing-bar-fill"></div>
+                        </div>
+                        <span class="indexing-percentage" id="indexing-percent">0%</span>
+                    </div>
+                </div>
+
+                <!-- Main File Browser and Search Results Panel -->
+                <div class="explorer-view" id="panel-explorer" style="display: none;">
+                    <!-- Explorer Layout: Left Tree Pane, Right File List Pane -->
+                    <div class="explorer-layout">
+                        <!-- Navigation Path / Breadcrumbs -->
+                        <div class="explorer-nav">
+                            <div class="breadcrumbs" id="explorer-breadcrumbs">
+                                <span class="crumb root" id="crumb-root">Root</span>
+                            </div>
+                            <div class="view-toggle">
+                                <button class="btn-icon active" id="btn-view-grid" title="Grid View">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="14" width="7" height="7"></rect>
+                                        <rect x="3" y="14" width="7" height="7"></rect>
+                                    </svg>
+                                </button>
+                                <button class="btn-icon" id="btn-view-list" title="List View">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Browser Grid/List Area -->
+                        <div class="explorer-content" id="explorer-grid-container">
+                            <!-- Populated by JavaScript -->
+                            <div class="file-grid" id="file-browser-grid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Results Screen -->
+                <div class="results-view" id="panel-results" style="display: none;">
+                    <div class="results-header">
+                        <h2>Search Results</h2>
+                        <span class="results-count" id="results-count-text">Found 0 matches</span>
+                    </div>
+                    <div class="results-list" id="search-results-list">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- OAuth Connection Modals (Simulated for Cloud Services) -->
+    <div class="modal-overlay" id="cloud-auth-modal" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="modal-auth-title">Connect Account</h2>
+                <button class="modal-close" id="btn-close-modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-provider-logo" id="modal-provider-logo">
+                    <!-- Dynamic SVG -->
+                </div>
+                <p id="modal-auth-description">Connecting your account allows iRAG to securely scan file metadata and indices for searching inside the cloud folder.</p>
+                
+                <div class="auth-steps">
+                    <div class="step-row active" id="auth-step-1">
+                        <div class="step-num">1</div>
+                        <div class="step-text">Establish Secure Session</div>
+                    </div>
+                    <div class="step-row" id="auth-step-2">
+                        <div class="step-num">2</div>
+                        <div class="step-text">Grant Directory Access Permissions</div>
+                    </div>
+                    <div class="step-row" id="auth-step-3">
+                        <div class="step-num">3</div>
+                        <div class="step-text">Sync Metadata & Build Index</div>
+                    </div>
+                </div>
+
+                <div class="auth-form" id="simulated-login-form">
+                    <div class="form-group">
+                        <label for="auth-email">Account Email</label>
+                        <input type="email" id="auth-email" value="user@example.com" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="auth-folder">Select Cloud Directory</label>
+                        <select id="auth-folder">
+                            <!-- Dynamic folders based on provider -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-auth">Cancel</button>
+                <button class="btn btn-primary" id="btn-start-auth">Authenticate & Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Preview Modal -->
+    <div class="modal-overlay" id="file-preview-modal" style="display: none;">
+        <div class="modal-card file-preview-card">
+            <div class="modal-header">
+                <div class="file-title-wrapper">
+                    <div class="file-icon" id="preview-file-icon"></div>
+                    <div class="file-info-header">
+                        <h2 id="preview-file-name">filename.txt</h2>
+                        <span class="file-path" id="preview-file-path">/path/to/filename.txt</span>
+                    </div>
+                </div>
+                <button class="modal-close" id="btn-close-preview">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body scrollable-body">
+                <div class="preview-meta-bar">
+                    <div class="meta-item">
+                        <span class="meta-label">Size:</span>
+                        <span class="meta-val" id="preview-meta-size">0 KB</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Type:</span>
+                        <span class="meta-val" id="preview-meta-type">Text File</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Modified:</span>
+                        <span class="meta-val" id="preview-meta-date">Date</span>
+                    </div>
+                </div>
+                
+                <div class="preview-content-container">
+                    <!-- Text/code preview block -->
+                    <pre id="preview-text-block" class="preview-pre" style="display: none;"><code id="preview-code-block"></code></pre>
+                    
+                    <!-- Image preview -->
+                    <div id="preview-image-block" class="preview-image-wrapper" style="display: none;">
+                        <img id="preview-image-element" src="" alt="File Preview">
+                    </div>
+
+                    <!-- Generic fallback preview (unsupported types) -->
+                    <div id="preview-fallback-block" class="preview-fallback" style="display: none;">
+                        <div class="fallback-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </div>
+                        <h3>No Preview Available</h3>
+                        <p>This file type cannot be previewed in the browser. You can still download or open it using local applications.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-close-preview-footer">Close Preview</button>
+                <button class="btn btn-primary" id="btn-download-file" style="display: none;">Download File</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Parsing Libraries (PDF, Word, Excel) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
